@@ -1,10 +1,10 @@
 #!/bin/env/node
-global.config = require('./config.json');
+global.config = require('./config/config.json');
 
 const App = require('./App'),
   http = require('http'),
   chalk = require('chalk'),
-  port = global.config.server.port;
+  port = global.config.port;
 
 server = http.createServer(new App());
 

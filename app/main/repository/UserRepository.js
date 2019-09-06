@@ -1,18 +1,18 @@
-const bcrypt = require('bcrypt-nodejs'),
-    BaseCrudRepository = require('../../core/base/BaseCrudRepository');
+const bcrypt = require('bcrypt'), BaseCrudRepository = require('../../core/base/BaseCrudRepository');
 
 class UserRepository extends BaseCrudRepository {
     constructor(){
-        super('Users');
+        super('users');
     }
 
-    async Create(record){
-        record.password = bcrypt.hashSync(record.password, bcrypt.genSaltSync(8));
+    validPassword (password, password_digest) {
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(password, password_digest, (err, valid) => {
+                resolve({ valid, data: err });
+            });
+        });
+    };
 
-        let user = await super.Create(record);
-
-        return user;
-    }
 }
 
 module.exports = UserRepository;

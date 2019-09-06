@@ -1,101 +1,73 @@
 const jwt = require('jsonwebtoken'),
+    bcrypt = require('bcrypt'),
     BaseController = require('../../../core/base/BaseController'),
     JsonResponse = require('../../../main/utils/JsonResponse'),
     jsonResponse = new JsonResponse(),
     UserRepository = require('../../repository/UserRepository'),
-    OfficeRepository = require('../../repository/OfficeRepository'),
-    RepositoryErrorHelper = require('../../helpers/errors/RepositoryErrorHelper'),
-    RepositoryHelper = new RepositoryErrorHelper(),
-    fs = require('fs-extra');
+    SesionValidators = require('../../middleware/Validators');
 
 class AuthController extends BaseController {
     constructor(app) {
         super(app);
+        this.repository = new UserRepository();
+
+        this.Login = this.Login.bind(this);
+        this.Register = this.Register.bind(this);
     }
 
     Router(path){
-        this.app.post(`${path}/login`, this.Login);
-        this.app.post(`${path}/logout`, this.Logout);
-        this.app.post(`${path}/register`, this.Register);
-        this.app.post(`${path}/change/password`, this.ChangePassword);
+        this.app.post(`${path}/login`, SesionValidators.Login(), SesionValidators.Validate, this.Login);
+        this.app.post(`${path}/register`, SesionValidators.Register(), SesionValidators.Validate, this.Register);
     }
 
     async Login(req, res) {
-        try {
-            const userRepository = new UserRepository();
-            const user = await userRepository.Find({ email: req.body.email, status: true });
+        try {        
+            const user = await this.repository.Find({names: ['email'], values: [req.body.email]});
+
             if (!user) return res.json(await jsonResponse.JsonError({}, "Usuario Invalido."));
-            const { valid } = await user.validPassword(req.body.password);
+
+            const { valid } = await this.repository.validPassword(req.body.password, user.password_digest);
+            let perm = 'isuser';
+
             if (valid) {
-                const data = { id: user._id, email: user.email, office: user.office._id.toString() };
+                const data = { id: user.id, email: user.email };
                 const sign = jwt.sign(data, global.config.sessionSecret, { expiresIn: '1d' });
-                let perm = 'isUser';
-                if(user.permissions.isAdmin === true) {
-                    perm = 'isAdmin';
-                } else if(user.permissions.isSuper === true) {
-                    perm = 'isSuper';
+            
+                if(user.isadmin === true) {
+                    perm = 'isadmin';
                 }
-                return res.json(await jsonResponse.Json({token: sign, user: {email: user.email, perm: perm}}, "Bienvenido"))
-            } return res.json(await jsonResponse.JsonError({}, "Usuario Invalido."))
+
+                return res.json(await jsonResponse.Json({token: sign, user: {email: user.email, perm: perm}}, "Welcome"))
+            } 
+            
+            return res.json(await jsonResponse.JsonError({}, "Invalid user."))
+
         } catch (error) {
-            res.json(await jsonResponse.JsonError({}, "Usuario Invalido."));
+            res.json(await jsonResponse.JsonError({}, "There was an error."));
         }
-    }
-
-
-    async Logout() {
-
     }
 
     async Register(req, res) {
         try {
-            const name = req.body.name,
-                email = req.body.email,
-                address = req.body.address,
-                phone = req.body.phone,
-                officeRepository = new OfficeRepository(),
-                plan = req.body.plan;
-
-            const office = await officeRepository.Create({name: name, email: email, address: address, phone: phone, plan: plan});
-
-            fs.mkdirsSync(`${__dirname}/../../../files/${name}`);
-
-            const userName = req.body.username,
-                userEmail = req.body.userEmail,
-                password = req.body.password,
-                passwordConfirm = req.body.passwordConfirm,
-                permissions = {
-                    isSuper: false,
-                    isAdmin: true,
-                    isUser: false
-                },
-                userRepository = new UserRepository();
+            let username = req.body.username || "",
+                email = req.body.email || "",
+                password = req.body.password || "",
+                passwordConfirm = req.body.passwordConfirm || "",
+                isAdmin = false;
 
             if(password !== passwordConfirm) {
-                const json = jsonResponse.JsonError({}, "Correo o password incorrectos.");
-                res.json(json)
+                return res.json(await jsonResponse.JsonError({}, "Incorrect email or password, please verify."));
+            } else {
+                password = bcrypt.hashSync(password, bcrypt.genSaltSync(2))
             }
-            const user = await userRepository.Create({username: userName, email: userEmail, password: password, office: office.id, permissions: permissions});
 
-            res.json(await jsonResponse.Json({}, "Su cuenta ha sido creada con exito."))
-        } catch(err) {
-            let errorHelper = null;
-            if(err.code) {
-                errorHelper = await RepositoryHelper.Verify(err);
-            }
-            let json = await jsonResponse.JsonError({}, "Hubo un error creando los datos. intente luego.");
+            let user = await this.repository.Create({names: 'username, email, password_digest, isadmin', values: [username, email, password, isAdmin]});
 
-            if(errorHelper !== undefined && errorHelper.error) {
-                json = await jsonResponse.JsonError({}, errorHelper.message);
-            }
-            res.json(json)
+            res.json(await jsonResponse.Json({}, "Your account has been created successfully."))
+        } catch(error) {        
+            res.json(await jsonResponse.JsonError({}, "There was an error."))
         }
-    }
-
-    async ChangePassword() {
-
-    }
-
+    }    
 }
 
 module.exports = AuthController;

@@ -1,0 +1,7 @@
+{
+    "host": "localhost",
+    "port": 5432,
+    "database": "employees-control",
+    "user": "postgres",
+    "password": "root"
+}

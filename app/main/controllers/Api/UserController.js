@@ -6,11 +6,9 @@ const Session = require('../../middleware/Session'),
     RepositotyErrorHelper = require('../../helpers/errors/RepositoryErrorHelper'),
     HelperError = new RepositotyErrorHelper(),
     UserRepository = require('../../repository/UserRepository'),
-    OfficeRepository = require('../../repository/OfficeRepository'),
     PlanWrapper = require('../../helpers/wrapper/PlanWrapper');
 
-const Repository = new UserRepository(),
-    officeRepository = new OfficeRepository();
+const Repository = new UserRepository();
 
 class UserController extends BaseController {
     constructor(app) {

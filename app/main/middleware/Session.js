@@ -28,6 +28,31 @@ class Session {
             return res.status(403).json({ error: true, msg: 'Invalid user.' });
         }
     }
+
+    static async isUser(req, res, next) {
+        try {
+            if(req.user) {
+                const isAdmin = req.user.isadmin;
+                return isAdmin === false ? next() : res.status(403).json({ error: true, msg: 'Not Access.' });
+            }
+
+            return res.status(403).json({ error: true, msg: 'Invalid user.' });
+        } catch (err) {
+            return res.status(403).json({ error: true, msg: 'Invalid user.' });
+        }
+    }
+
+    static async hasPermissions(req, res, next) {
+        try {
+            if(req.user) {                
+                return req.user.isadmin ? next() : res.status(403).json({ error: true, msg: 'Not Access.' });
+            }
+
+            return res.status(403).json({ error: true, msg: 'Invalid user.' });
+        } catch (err) {
+            return res.status(403).json({ error: true, msg: 'Invalid user.' });
+        }
+    }
 }
 
 module.exports = Session;

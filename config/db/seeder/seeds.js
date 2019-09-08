@@ -10,7 +10,7 @@ class Seeds {
     async Initialize() {
         try {
             await this.createUsers();
-            console.log('Table users created');            
+            console.log('Users seeder created');            
             console.log('End seeds succefully');
             process.exit();    
         } catch (error) {

@@ -29,14 +29,14 @@ class UserController extends BaseController {
     async List(req, res) {
         try {
             const limit = Number(req.query.limit) > 0 ? req.query.limit : 9,
-                page = req.query.skip || 1;
+                page = req.query.skip || 0;
 
             const [users, total] = await Promise.all([
                 this.repository.Find({names: [`!id`], values: [parseInt(req.user.id)]}, '*', limit, page),
                 this.repository.Count({names: [`!id`], values: [parseInt(req.user.id)]}),
             ]);
             
-            res.json(await jsonResponse.Json({users: users, total, page, limit}))
+            res.json(await jsonResponse.Json({users, total, page, limit}))
         } catch (err) {
             res.json(await jsonResponse.JsonError({}, "There was an error."));
         }
@@ -61,7 +61,7 @@ class UserController extends BaseController {
 
             const user = await this.repository.Create({names: 'username, email, password_digest, isadmin', values: [username, email, password, isAdmin]});
 
-            res.json(await jsonResponse.Json({}, "El usuario ha sido creado con exito."))
+            res.json(await jsonResponse.Json({}, "The record was created succesful."))
 
         } catch (err) {
             res.json(await jsonResponse.JsonError({}, "There was an error."));
@@ -81,7 +81,7 @@ class UserController extends BaseController {
 
             const user = await this.repository.Update({names: ['username', 'email', 'isadmin'], values: [username, email, isAdmin, parseInt(id)], condition: {fields: ['id']}});
 
-            res.json(await jsonResponse.Json({}, "El usuario ha sido modificado con exito."))
+            res.json(await jsonResponse.Json({}, "The record was updated succesful."));
         } catch (err) {
             res.json(await jsonResponse.JsonError({}, "There was an error."));
         }
@@ -93,7 +93,7 @@ class UserController extends BaseController {
 
             const user = await this.repository.Remove({names: [`id`], values: [parseInt(id)]});
             
-            res.json(await jsonResponse.Json({}, "El usuario ha sido eliminado con exito."))
+            res.json(await jsonResponse.Json({}, "The record was removed succesful."))
         } catch (err) {
             res.json(await jsonResponse.JsonError({}, "There was an error."));
         }

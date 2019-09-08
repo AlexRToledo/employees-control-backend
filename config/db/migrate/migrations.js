@@ -13,7 +13,7 @@ class Migration {
             await this.createUsers();
             console.log('Table users created');
             await this.createControlDay();
-            console.log('Table users created');    
+            console.log('Table control created');    
             console.log('End migration succefully');  
             process.exit()          
         } catch (error) {
@@ -39,7 +39,8 @@ class Migration {
         await this.pool.query(`
             CREATE TABLE ${name} (
                 id SERIAL NOT NULL PRIMARY KEY,
-                FOREIGN KEY (id) REFERENCES users (id),
+                users_id INTEGER NOT NULL,
+                FOREIGN KEY (users_id) REFERENCES users (id),
                 arrivals TEXT [],
                 departures TEXT [],
                 day DATE NOT NULL DEFAULT CURRENT_DATE            

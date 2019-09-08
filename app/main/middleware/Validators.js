@@ -1,6 +1,7 @@
 const { check, param, oneOf, validationResult } = require('express-validator');
 
 class Validators {
+    //Auth
     static Login() {
         return [
             check('email').exists().withMessage(' Must provide at a email field.').isEmail(),
@@ -17,6 +18,7 @@ class Validators {
         ];
     }
 
+    // Generic
     static List() {
         return [
             check('limit').exists().withMessage(' Must provide an limit field.').isInt(),
@@ -36,11 +38,29 @@ class Validators {
         ]
     }
     
+    // Users
     static EditUsers() {
         return [
             check('id').exists().withMessage(' Must provide an id field.').isInt(),
             check('username').optional().isString(),
             check('email').optional().isEmail()
+        ]
+    }
+
+    //Controls
+    static CreateControls() {
+        return [            
+            check('users_id').exists().withMessage(' Must provide an users_id field.').isInt(),
+            check('day').exists().withMessage(' Must provide a day field.').isString(),
+            check('arrivals').exists().withMessage(' Must provide an arrivals field.').isArray(),
+            check('departures').exists().withMessage(' Must provide a departures field.').isArray()
+        ]
+    }
+    static EditControls() {
+        return [
+            check('id').exists().withMessage(' Must provide an id field.').isInt(),
+            check('arrivals').exists().withMessage(' Must provide an arrivals field.').isArray(),
+            check('departures').exists().withMessage(' Must provide a departures field.').isArray()
         ]
     }
 

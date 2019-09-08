@@ -61,7 +61,7 @@ class AuthController extends BaseController {
                 password = bcrypt.hashSync(password, bcrypt.genSaltSync(2))
             }
 
-            let user = await this.repository.Create({names: 'username, email, password_digest, isadmin', values: [username, email, password, isAdmin]});
+            const user = await this.repository.Create({names: 'username, email, password_digest, isadmin', values: [username, email, password, isAdmin]});
 
             res.json(await jsonResponse.Json({}, "Your account has been created successfully."))
         } catch(error) {        

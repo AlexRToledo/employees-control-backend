@@ -1,5 +1,6 @@
 //Api
 const AuthController = require('../../app/main/controllers/Api/AuthController');
+const UserController = require('../../app/main/controllers/Api/UserController');
 
 //Web
 const MainController = require('../../app/main/controllers/Web/MainController');
@@ -18,6 +19,7 @@ class Router {
 
         //Api
         new AuthController(app).Router(`${api}/auth`);
+        new UserController(app).Router(`${api}/users`);
 
         //Web
         new MainController(app).Router(`/`);

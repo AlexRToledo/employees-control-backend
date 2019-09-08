@@ -1,4 +1,5 @@
-const bcrypt = require('bcrypt'), BaseCrudRepository = require('../../core/base/BaseCrudRepository');
+const bcrypt = require('bcrypt'), 
+    BaseCrudRepository = require('../../core/base/BaseCrudRepository');
 
 class UserRepository extends BaseCrudRepository {
     constructor(){

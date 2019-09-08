@@ -12,7 +12,17 @@ class BaseCrudRepository {
         try {
             this.setValuesForSelect(query);
             let data = query.values ? await this.pool.query(`SELECT ${select} FROM ${this._model} ${query.index} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`, query.values) : await this.pool.query(`SELECT ${select} FROM ${this._model} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`);
-            return query.values ? data.rows[0] : data.rows;
+            return data.rows.length === 1 ? data.rows[0] : data.rows;
+        } catch (error) {
+            reject(error);
+        }
+    }
+
+    async Count(query, select='*', limit="NULL", skip=0, order_by="ASC") {
+        try {
+            this.setValuesForSelect(query);
+            let data = query.values ? await this.pool.query(`SELECT COUNT(${select}) FROM ${this._model} ${query.index} GROUP BY id`, query.values) : await this.pool.query(`SELECT COUNT(${select}) FROM ${this._model} ${query.index} GROUP BY id`);
+            return data.rows.length === 1 ? data.rows[0] : data.rows;
         } catch (error) {
             reject(error);
         }
@@ -29,8 +39,8 @@ class BaseCrudRepository {
 
     async Update(query) {
         try {
-            this.setValuesForUpdateOrRemove(query);
-            return await this.pool.query(`UPDATE ${this._model} SET ${query.index} WHERE ${query.condition}`, query.values);
+            this.setValuesForUpdate(query);
+            return await this.pool.query(`UPDATE ${this._model} SET ${query.index}`, query.values);
         } catch (error) {
             reject(error);
         }
@@ -38,8 +48,8 @@ class BaseCrudRepository {
 
     async Remove(query) {
         try {
-            this.setValuesForUpdateOrRemove(query);
-            return await this.pool.query(`'DELETE FROM ${this._model} WHERE ${query.condition}`, query.values);
+            this.setValuesForSelect(query);
+            return await this.pool.query(`DELETE FROM ${this._model} ${query.index}`, query.values);
         } catch (error) {
             reject(error);
         }
@@ -52,9 +62,39 @@ class BaseCrudRepository {
             query.index = `WHERE `
             for (const val of query.names) {
                 if(count === query.names.length) {
-                    query.index += `${val} = $${count}`;
+                    this.conditionalParser(query, val, count);
                 } else {
-                    query.index += `${val} = $${count}, `;
+                    this.conditionalParser(query, val, count);
+                    query.index += ', ';
+                }
+                count++;
+            }
+        }
+    }
+
+    setValuesForUpdate(query) {
+        let count = 1;
+        query.index = "";
+        if(query.values) {            
+            for (const val of query.names) {
+                if(count === query.names.length) {
+                    this.conditionalParser(query, val, count);
+                } else {
+                    this.conditionalParser(query, val, count);
+                    query.index += ', ';
+                }
+                count++;
+            }
+        }
+
+        if(query.condition) {        
+            query.index += ` WHERE ` 
+            for (const val of query.condition.fields) {
+                if(count === (query.condition.fields.length + count - 1)) {
+                    this.conditionalParser(query, val, count);
+                } else {
+                    this.conditionalParser(query, val, count);
+                    query.index += ', ';
                 }
                 count++;
             }
@@ -76,21 +116,14 @@ class BaseCrudRepository {
         }
     }
 
-    setValuesForUpdateOrRemove(query) {
-        let count = 1;
-        if(query.names) {
-            query.index = "";
-            for (const val of query.names) {
-                if(count === query.names.length) {
-                    query.index += `${val} = $${count}`;
-                } else {
-                    query.index += `${val} = $${count}, `;
-                }
-                count++;
-            }
-        }
-        if(query.condition) {
-            query.condition += ` = $${query.values}`;
+    conditionalParser(query, val, count) {
+        if(val.includes('LIKE')) {
+            query.index += `${val} $${count} `;
+        } else if (val.includes('!')) {
+            let [,aux] = val.split('!')
+            query.index += `${aux} != $${count} `;
+        } else {
+            query.index += `${val} = $${count} `;
         }
     }
 

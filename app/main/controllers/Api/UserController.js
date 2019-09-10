@@ -32,7 +32,7 @@ class UserController extends BaseController {
                 page = req.query.skip || 0;
 
             const [users, total] = await Promise.all([
-                this.repository.Find({names: [`!id`], values: [parseInt(req.user.id)]}, '*', limit, page),
+                this.repository.FindAll({names: [`!id`], values: [parseInt(req.user.id)]}, '*', limit, page),
                 this.repository.Count({names: [`!id`], values: [parseInt(req.user.id)]}),
             ]);
             

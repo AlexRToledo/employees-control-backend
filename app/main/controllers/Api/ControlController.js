@@ -30,7 +30,7 @@ class ControlController extends BaseController {
             page = req.query.skip || 0;
 
             const [controls, total] = await Promise.all([
-                this.repository.Find({}, '*', limit, page),
+                this.repository.FindAll({}, '*', limit, page),
                 this.repository.Count({}),
             ]);
             

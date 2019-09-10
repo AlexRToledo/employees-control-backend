@@ -17,7 +17,7 @@ class ControlController extends BaseController {
     }
 
     Router(path) {
-        this.app.get(`${path}`, Session.isAuth, Session.hasPermissions, SesionValidators.List(), SesionValidators.Validate, this.List);
+        this.app.get(`${path}`, Session.isAuth, Session.hasPermissions, this.List);
         this.app.get(`${path}/:id`, Session.isAuth, Session.isAdmin, SesionValidators.Get(), SesionValidators.Validate, this.Get);
         this.app.post(`${path}/create`, Session.isAuth, Session.isAdmin, SesionValidators.CreateControls(), SesionValidators.Validate, this.Create);
         this.app.put(`${path}/edit/:id`, Session.isAuth, Session.hasPermissions, SesionValidators.EditControls(), SesionValidators.Validate, this.Edit);

@@ -41,8 +41,8 @@ class Migration {
                 id SERIAL NOT NULL PRIMARY KEY,
                 users_id INTEGER NOT NULL,
                 FOREIGN KEY (users_id) REFERENCES users (id),
-                arrivals TEXT [],
-                departures TEXT [],
+                arrivals VARCHAR,
+                departures VARCHAR,
                 day DATE NOT NULL DEFAULT CURRENT_DATE            
             );
         `);

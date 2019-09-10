@@ -18,14 +18,7 @@ class Validators {
         ];
     }
 
-    // Generic
-    static List() {
-        return [
-            check('limit').exists().withMessage(' Must provide an limit field.').isInt(),
-            check('skip').exists().withMessage(' Must provide an skip field.').isInt()
-        ]
-    }
-    
+    // Generic        
     static Get() {
         return [
             check('id').exists().withMessage(' Must provide an id field for get.').isInt()
@@ -52,15 +45,15 @@ class Validators {
         return [            
             check('users_id').exists().withMessage(' Must provide an users_id field.').isInt(),
             check('day').exists().withMessage(' Must provide a day field.').isString(),
-            check('arrivals').exists().withMessage(' Must provide an arrivals field.').isArray(),
-            check('departures').exists().withMessage(' Must provide a departures field.').isArray()
+            check('arrivals').exists().withMessage(' Must provide an arrivals field.'),
+            check('departures').exists().withMessage(' Must provide a departures field.')
         ]
     }
     static EditControls() {
         return [
             check('id').exists().withMessage(' Must provide an id field.').isInt(),
-            check('arrivals').exists().withMessage(' Must provide an arrivals field.').isArray(),
-            check('departures').exists().withMessage(' Must provide a departures field.').isArray()
+            check('arrivals').exists().withMessage(' Must provide an arrivals field.'),
+            check('departures').exists().withMessage(' Must provide a departures field.')
         ]
     }
 

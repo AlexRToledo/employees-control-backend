@@ -28,9 +28,11 @@ class UserController extends BaseController {
 
     async List(req, res) {
         try {
-            const limit = Number(req.query.limit) > 0 ? req.query.limit : 9,
+            let limit = Number(req.query.limit) > 0 ? req.query.limit : 9,
                 page = req.query.skip || 0;
-
+            if(req.query.all) {
+                limit = 'NULL'
+            }
             const [users, total] = await Promise.all([
                 this.repository.FindAll({names: [`!id`], values: [parseInt(req.user.id)]}, '*', limit, page),
                 this.repository.Count({names: [`!id`], values: [parseInt(req.user.id)]}),

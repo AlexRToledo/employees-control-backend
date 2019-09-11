@@ -45,3 +45,5 @@ function onListening() {
 
   console.log(chalk.green.bgBlack(`Listening on http://localhost:${port}`));
 }
+
+module.exports = server

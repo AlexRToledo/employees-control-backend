@@ -74,8 +74,13 @@ class BaseCrudRepository {
                 if(count === query.names.length) {
                     this.conditionalParser(query, val, count);
                 } else {
-                    this.conditionalParser(query, val, count);
-                    query.index += ', ';
+                    if(count === query.names.length - 1) {
+                        this.conditionalParser(query, val, count);
+                        query.index += 'AND ';
+                    } else {
+                        this.conditionalParser(query, val, count);
+                        query.index += ', ';
+                    }
                 }
                 count++;
             }

@@ -6,7 +6,7 @@ class Session {
         try {
             const [,token] = req.headers.authorization.split(' ');
             const decoded = jwt.verify(token, global.config.sessionSecret);
-            req.user = await repository.Find({names: ['id'], values: [decoded.id]});
+            req.user = await repository.Find({names: ['id'], values: [decoded.id]}, 'id, email, username, isadmin');
             if(!req.user) {
                 return res.status(403).json({ error: true, msg: 'Invalid user.' });
             }
@@ -45,7 +45,7 @@ class Session {
     static async hasPermissions(req, res, next) {
         try {
             if(req.user) {                
-                return req.user.isadmin ? next() : res.status(403).json({ error: true, msg: 'Not Access.' });
+                return next();
             }
 
             return res.status(403).json({ error: true, msg: 'Invalid user.' });

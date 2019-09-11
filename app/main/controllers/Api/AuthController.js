@@ -37,7 +37,7 @@ class AuthController extends BaseController {
                     perm = 'isadmin';
                 }
 
-                return res.json(await jsonResponse.Json({token: sign, user: {email: user.email, perm: perm}}, "Welcome"))
+                return res.json(await jsonResponse.Json({token: sign, user: {username: user.username, email: user.email, perm: perm}}, "Welcome"))
             } 
             
             return res.json(await jsonResponse.JsonError({}, "Invalid user."))

@@ -34,8 +34,8 @@ class UserController extends BaseController {
                 limit = 'NULL'
             }
             const [users, total] = await Promise.all([
-                this.repository.FindAll({names: [`!id`], values: [parseInt(req.user.id)]}, '*', limit, page),
-                this.repository.Count({names: [`!id`], values: [parseInt(req.user.id)]}),
+                this.repository.FindAll({names: [`!id`, '!isadmin'], values: [parseInt(req.user.id), 'TRUE']}, 'id, username, email', limit, page),
+                this.repository.Count({names: [`!id`, '!isadmin'], values: [parseInt(req.user.id), 'TRUE']}),
             ]);
             
             res.json(await jsonResponse.Json({users, total, page, limit}))

@@ -2,12 +2,14 @@ const BaseController = require('../../../core/base/BaseController'),
     Session = require('../../middleware/Session'),
     SesionValidators = require('../../middleware/Validators'),    
     ControlRepository = require('../../repository/ControlRepository'),
+    UserRepository = require('../../repository/UserRepository'),
     JsonResponse = require('../../../main/utils/JsonResponse'),
     jsonResponse = new JsonResponse();
 class ControlController extends BaseController {
     constructor(app) {
         super(app);
         this.repository = new ControlRepository();
+        this.userRepository = new UserRepository();
 
         this.List = this.List.bind(this);        
         this.Get = this.Get.bind(this);
@@ -26,12 +28,24 @@ class ControlController extends BaseController {
 
     async List(req, res) {
           try {
-            const limit = Number(req.query.limit) > 0 ? req.query.limit : 9,
-            page = req.query.skip || 0;
+            let limit = Number(req.query.limit) > 0 ? req.query.limit : 9,
+            page = req.query.skip || 0,
+            user = null;
+            let query = {                
+            };
+            if(req.query.email) {
+                query.names = ['email'],
+                query.values = [req.query.email];
+
+                user = await this.userRepository.Find(query);
+                
+                query.names = ['users_id'];
+                query.values = [user.id];
+            }    
 
             const [controls, total] = await Promise.all([
-                this.repository.FindAll({}, '*', limit, page),
-                this.repository.Count({}),
+                this.repository.FindAll(query, '*', limit, page),
+                this.repository.Count(query),
             ]);
             
             res.json(await jsonResponse.Json({controls, total, page, limit}))

@@ -66,7 +66,10 @@ class UserController extends BaseController {
             res.json(await jsonResponse.Json({}, "The record was created succesful."))
 
         } catch (err) {
-            res.json(await jsonResponse.JsonError({}, "There was an error."));
+            if(err.constraint) {
+               return res.json(await jsonResponse.JsonError({}, `There exist an user with that ${err.constraint.split('_')[1]}.`));    
+            }
+            return res.json(await jsonResponse.JsonError({}, "There was an error."));
         }
     }
 

@@ -33,6 +33,12 @@ class ControlController extends BaseController {
             user = null;
             let query = {                
             };
+            let select = '*'
+            if(req.user.isadmin) {
+                query.join = `INNER JOIN users ON users.id = controls.users_id`;
+                select = 'controls.id, day, arrivals, departures, users_id, users.email'
+            }
+
             if(req.query.email) {
                 query.names = ['email'],
                 query.values = [req.query.email];
@@ -44,7 +50,7 @@ class ControlController extends BaseController {
             }    
 
             const [controls, total] = await Promise.all([
-                this.repository.FindAll(query, '*', limit, page),
+                this.repository.FindAll(query, select, limit, page),
                 this.repository.Count(query),
             ]);
             

@@ -11,7 +11,7 @@ class BaseCrudRepository {
     async FindAll(query, select='*', limit="NULL", skip=0, order_by="ASC") {
         try {
             this.setValuesForSelect(query);
-            let data = query.values ? await this.pool.query(`SELECT ${select} FROM ${this._model} ${query.index} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`, query.values) : await this.pool.query(`SELECT ${select} FROM ${this._model} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`);
+            let data = query.values ? await this.pool.query(`SELECT ${select} FROM ${this._model} ${query.join} ${query.index} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`, query.values) : await this.pool.query(`SELECT ${select} FROM ${this._model} ${query.join} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`);
             return data.rows;
         } catch (error) {
             reject(error);
@@ -21,7 +21,7 @@ class BaseCrudRepository {
     async Find(query, select='*', limit="NULL", skip=0, order_by="ASC") {
         try {
             this.setValuesForSelect(query);
-            let data = query.values ? await this.pool.query(`SELECT ${select} FROM ${this._model} ${query.index} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`, query.values) : await this.pool.query(`SELECT ${select} FROM ${this._model} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`);
+            let data = query.values ? await this.pool.query(`SELECT ${select} FROM ${this._model} ${query.join} ${query.index} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`, query.values) : await this.pool.query(`SELECT ${select} FROM ${this._model} ${query.join} ORDER BY id ${order_by} LIMIT ${limit} OFFSET ${skip}`);
             return data.rows.length === 1 ? data.rows[0] : data.rows;
         } catch (error) {
             reject(error);
@@ -56,7 +56,7 @@ class BaseCrudRepository {
         }
     }
 
-    async Remove(query) {
+    async Remove(query, cascade=false) {
         try {
             this.setValuesForSelect(query);
             return await this.pool.query(`DELETE FROM ${this._model} ${query.index}`, query.values);
@@ -84,7 +84,7 @@ class BaseCrudRepository {
                 }
                 count++;
             }
-        }
+        }       
     }
 
     setValuesForUpdate(query) {

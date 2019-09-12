@@ -40,7 +40,7 @@ class Migration {
             CREATE TABLE ${name} (
                 id SERIAL NOT NULL PRIMARY KEY,
                 users_id INTEGER NOT NULL,
-                FOREIGN KEY (users_id) REFERENCES users (id),
+                FOREIGN KEY (users_id) REFERENCES users (id) ON DELETE CASCADE,
                 arrivals VARCHAR,
                 departures VARCHAR,
                 day DATE NOT NULL DEFAULT CURRENT_DATE            

@@ -93,7 +93,7 @@ class UserController extends BaseController {
         try {
             const id = req.body.id;
 
-            const user = await this.repository.Remove({names: [`id`], values: [parseInt(id)]});
+            const user = await this.repository.Remove({names: [`id`], values: [parseInt(id)]}, true);
             
             res.json(await jsonResponse.Json({}, "The record was removed succesful."))
         } catch (err) {

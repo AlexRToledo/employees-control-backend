@@ -33,7 +33,7 @@ Backend for Employees Control
     ```
 
 5. For login use this credentials
-    | Email | Password |
-    | :------ | :--------: |
-    | admin@control.com | root |    
+    ```code
+    email: admin@control.com | password: root
+    ```    
 
